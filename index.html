@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>观世音 · 灵签</title>
+<style>
+:root {
+  --bg: #e8e4de;
+  --card: #f2efe9;
+  --text: #5a504a;
+  --muted: #9a8e82;
+  --gold: #a07840;
+  --gold-light: #c09858;
+  --border: #d0c8bc;
+  --divider: rgba(160,120,64,0.2);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','Songti SC','SimSun',serif;min-height:100vh;}
+
+/* ─── 全页布局 ─── */
+.page {
+  display: grid;
+  grid-template-columns: 0.55fr 1.45fr;
+  min-height: 100vh;
+}
+
+/* 左侧：文字 */
+.info-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 64px 48px 64px 72px;
+}
+.section-label {
+  font-size: 10px;
+  letter-spacing: 0.38em;
+  font-weight: 400;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.eyebrow {
+  font-size: 9px;
+  letter-spacing: 0.4em;
+  font-weight: 400;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+h1 {
+  font-size: clamp(42px,5.5vw,70px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+  color: #2e2824;
+  white-space: nowrap;
+}
+.tagline {
+  font-size: 16px;
+  letter-spacing: 0.1em;
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 36px;
+  white-space: nowrap;
+}
+.intro {
+  font-size: 13px;
+  line-height: 2;
+  color: var(--text);
+  margin-bottom: 44px;
+  max-width: 320px;
+}
+
+/* 移动端响应式 */
+@media (max-width: 768px) {
+  .page { grid-template-columns: 1fr; }
+  .img-side { min-height: 65vh; order: -1; }
+  .info-side { padding: 48px 28px; }
+  h1 { font-size: 38px; margin-bottom: 12px; }
+  .tagline { font-size: 14px; margin-bottom: 28px; }
+  .intro { margin-bottom: 32px; font-size: 12px; }
+}
+.lotus-notice {
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  color: rgba(255,255,255,1);
+  text-shadow: 0 1px 8px rgba(0,0,0,0.7), 0 0 24px rgba(255,255,255,0.2);
+  line-height: 1.8;
+  margin-top: 4px;
+}
+
+/* 右侧：图 + 莲蓬 */
+.img-side {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+}
+.img-side img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ─── 莲蓬触发区 ─── */
+.lotus-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.lotus-overlay:hover { background: rgba(0,0,0,0.05); }
+
+.lotus-wrap {
+  width: 110px;
+  height: 110px;
+  transition: transform 0.25s ease;
+}
+.lotus-wrap:hover { transform: scale(1.1); }
+.lotus-wrap img {
+  position: static;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 0;
+}
+
+@keyframes lotus-shake {
+  0%,100% { transform: rotate(0deg) translateX(0); }
+  15% { transform: rotate(-7deg) translateX(-5px); }
+  30% { transform: rotate(6deg) translateX(4px); }
+  45% { transform: rotate(-5deg) translateX(-4px); }
+  60% { transform: rotate(4deg) translateX(3px); }
+  75% { transform: rotate(-3deg) translateX(-2px); }
+  90% { transform: rotate(2deg) translateX(2px); }
+}
+.lotus-wrap.animating { animation: lotus-shake 0.09s ease-in-out infinite; }
+
+/* ─── 签文浮层 ─── */
+.lotus-card {
+  position: absolute;
+  inset: 0;
+  background: rgba(232,228,222,0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+.lotus-card.visible { opacity: 1; pointer-events: all; }
+
+.lc-inner {
+  text-align: center;
+  padding: 40px 36px;
+  max-width: 300px;
+  width: 100%;
+}
+.lc-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.lc-type {
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+}
+.lc-type--hero {
+  font-size: clamp(32px,4vw,52px);
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: 0.06em;
+  color: #2e2824;
+}
+.lc-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--divider);
+}
+.lc-num {
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+}
+.lc-title {
+  display: none;
+}
+.lc-poem {
+  font-size: 14px;
+  line-height: 2.4;
+  color: var(--text);
+  font-style: italic;
+  letter-spacing: 0.06em;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border-left: 1px solid var(--divider);
+  border-right: 1px solid var(--divider);
+  text-align: left;
+}
+.lc-meaning {
+  font-size: 13px;
+  line-height: 2;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+.lc-tag {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  padding: 5px 14px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  margin-bottom: 28px;
+}
+.lc-tag.tag-dl  { color: #a07840; border-color: rgba(160,120,64,0.4); }
+.lc-tag.tag-pj  { color: #6a8a6a; border-color: rgba(106,138,106,0.4); }
+.lc-tag.tag-xj  { color: #8a7a6a; border-color: rgba(138,122,106,0.4); }
+.lc-tag.tag-bh  { color: #9a6a6a; border-color: rgba(154,106,106,0.4); }
+
+.lc-close {
+  font-family: inherit;
+  font-weight: 400;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--muted);
+  background: none;
+  border: 1px solid var(--border);
+  padding: 10px 32px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.lc-close:hover { border-color: var(--gold); color: var(--gold); background: rgba(160,120,64,0.06); }
+
+/* ─── 移动端响应式 ─── */
+@media (max-width: 768px) {
+  .page { grid-template-columns: 1fr; }
+  .img-side { min-height: 60vh; order: -1; }
+  .info-side { padding: 56px 32px; }
+  h1 { font-size: 48px; margin-bottom: 24px; }
+  .intro { margin-bottom: 36px; }
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <!-- 左：文字 -->
+  <div class="info-side">
+    <div class="eyebrow">The Only Wisdom Is Knowing You Know Nothing</div>
+    <h1>嘘！别er若话~</h1>
+    <h1>观荫</h1>
+    <p class="tagline">若见诸相非相，即见如来</p>
+    <p class="intro">
+      一切有为法，如梦幻泡影。<br>
+      执相而求，咫尺千里。<br>
+      以心传心，不立文字。
+    </p>
+  </div>
+
+  <!-- 右：图 + 莲蓬 -->
+  <div class="img-side">
+    <img src="图素材(1) - 副本.jpg" alt="观世音">
+
+    <!-- 莲蓬触发区：左上角 -->
+    <div class="lotus-overlay" id="lotusOverlay" onclick="startDraw()" style="align-items:flex-start;justify-content:flex-start;padding:48px 0 0 48px;">
+      <div class="lotus-wrap" id="lotusWrap">
+        <img src="莲花.png" alt="莲花">
+      </div>
+      <p class="lotus-notice">轻触莲蓬，得一签文<br>心诚则灵</p>
+    </div>
+
+    <!-- 签文浮层 -->
+    <div class="lotus-card" id="lotusCard">
+      <div class="lc-inner">
+        <div class="lc-header">
+          <span class="lc-type" id="lcType"></span>
+          <div class="lc-divider"></div>
+          <span class="lc-num" id="lcNum"></span>
+        </div>
+        <div class="lc-title" id="lcTitle"></div>
+        <div class="lc-poem"  id="lcPoem"></div>
+        <div class="lc-meaning" id="lcMeaning"></div>
+        <span class="lc-tag" id="lcTag"></span>
+        <button class="lc-close" onclick="closeCard()">收 下</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const FORTUNES = [
+  {
+    type:"行",num:"",title:"行",
+    poem:"风起云涌时，\n顺势方得路。\n不问前路远，\n踏步即通途。",
+    meaning:"此签主行动。时机已至，勿需犹豫，放心去做。",
+    tag:"放手去做",tagClass:"tag-dl"
+  },
+  {
+    type:"不行",num:"",title:"不行",
+    poem:"山重水复疑无路，\n静待云开见月明。\n此刻莫强求，\n退守待天时。",
+    meaning:"此签主暂缓。不是不能，是时机未到。再等等，会更好。",
+    tag:"静待时机",tagClass:"tag-xj"
+  },
+  {
+    type:"都行",num:"",title:"都行",
+    poem:"心有灵犀一点通，\n东西南北任西东。\n此刻无对错，\n随缘皆是好。",
+    meaning:"此签主随缘。无论怎么选，都是对的，放轻松。",
+    tag:"随缘自在",tagClass:"tag-pj"
+  },
+];
+
+const HIDDEN_FORTUNE = {
+  type:'差不多得了，求佛不如求自己，你就是佛。悟！',num:'',tag:'',
+  poem:'差不多得了。\n求佛不如求自己，\n你就是佛。',
+  meaning:'签筒已被你摇冒烟了。歇会儿吧，佛在你心里，不在签里。'
+};
+
+function pick(){return FORTUNES[Math.floor(Math.random()*FORTUNES.length)];}
+
+function closeCard(){
+  document.getElementById('lotusCard').classList.remove('visible');
+}
+
+function showLotusCard(f, isHidden){
+  const typeEl    = document.getElementById('lcType');
+  const numEl    = document.getElementById('lcNum');
+  const dividerEl = document.querySelector('.lc-divider');
+
+  if (isHidden) {
+    typeEl.textContent = '隐藏签';
+    typeEl.className   = 'lc-type';
+    numEl.textContent  = '悟！';
+    numEl.style.color  = '#2e2824';
+    numEl.style.fontSize = '28px';
+    dividerEl.style.display = 'block';
+  } else {
+    typeEl.textContent = f.type;
+    typeEl.className   = 'lc-type';
+    numEl.textContent  = f.num;
+    numEl.style.color  = '';
+    numEl.style.fontSize = '';
+    dividerEl.style.display = 'block';
+  }
+
+  document.getElementById('lcTitle').textContent   = '';
+  document.getElementById('lcPoem').textContent    = f.poem;
+  document.getElementById('lcMeaning').textContent = f.meaning;
+  const tg = document.getElementById('lcTag');
+  tg.textContent = f.tag;
+  tg.className    = 'lc-tag tag-dl';
+  tg.style.display = f.tag ? 'inline-block' : 'none';
+  document.getElementById('lotusCard').classList.add('visible');
+}
+
+// 3分钟内超过5次点击，触发隐藏签
+const clickTimestamps = [];
+const RATE_WINDOW = 3 * 60 * 1000; // 3分钟
+const RATE_LIMIT   = 5;
+
+function startDraw(){
+  const lotus  = document.getElementById('lotusWrap');
+  const notice = document.querySelector('.lotus-notice');
+
+  // 清理超出3分钟的时间戳
+  const now = Date.now();
+  while (clickTimestamps.length > 0 && now - clickTimestamps[0] > RATE_WINDOW) {
+    clickTimestamps.shift();
+  }
+
+  const isHidden = clickTimestamps.length >= RATE_LIMIT;
+  clickTimestamps.push(now);
+
+  lotus.classList.add('animating');
+  setTimeout(()=>{
+    lotus.classList.remove('animating');
+    const f = isHidden ? HIDDEN_FORTUNE : pick();
+    showLotusCard(f, isHidden);
+    notice.textContent = isHidden ? '你 就是佛！' : '轻触莲蓬，得一签文\n心诚则灵';
+  },2000);
+}
+</script>
+</body>
+</html>
